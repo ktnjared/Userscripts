@@ -23,9 +23,30 @@
 
   document.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();
-    if (!e.ctrlKey || e.metaKey || e.altKey || !VALID_KEYS.has(key)) return;
+    if (!e.ctrlKey || e.metaKey || e.altKey) return;
 
-    // stop the browser/OS from handling Ctrl+K, Ctrl+/ etc.
+    // Remap Ctrl+N -> behaves like Cmd+K (New Thread)
+    if (key === 'n') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      const synthetic = new KeyboardEvent('keydown', {
+        key: 'k',
+        code: 'KeyK',
+        metaKey: true,
+        ctrlKey: false,
+        shiftKey: false,
+        altKey: false,
+        bubbles: true,
+        cancelable: true,
+      });
+      (e.target || document.activeElement || document.body).dispatchEvent(synthetic);
+      return;
+    }
+
+    if (!VALID_KEYS.has(key)) return;
+
+    // stop the browser or OS from handling Ctrl+K, Ctrl+/ etc.
     e.preventDefault();
     e.stopImmediatePropagation();
 
